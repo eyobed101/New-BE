@@ -1,4 +1,5 @@
 import express from "express";
+import { Socket } from "socket.io";
 import { authenticate } from "../services/auth.Services.js";
 import AdminFunctions from "../controllers/Admin.Controller.js";
 import SuperAdminFunctions from "../controllers/SuperAdmin.Controller.js";
@@ -8,7 +9,7 @@ import {
   verifySuperAdmin,
   verifyToken,
 } from "../helpers/jwt.js";
-import { Draw } from "../controllers/Game.Controller.js";
+import { Draw, StoreTickets } from "../controllers/Game.Controller.js";
 import {
   CheckTicket,
   fetchLastGame,
@@ -27,22 +28,15 @@ import superAdmin from "../models/superAdmin.js";
 
 const router = express.Router();
 
-
-let requests = [];
-
 let acceptingRequests = true;
-let remainingTime = 3 * 60; 
-
+let remainingTime = 3 * 60;
 
 router.post('/accept', (req, res) => {
-
-
   if (acceptingRequests) {
-    requests.push(req.body);
-    let formatedTime = formatTime(remainingTime)
-    console.log('Remaining time:', formatedTime);
-
-    res.status(200).json({ message: 'Request accepted' , remaining:formatedTime});
+    StoreTickets(req.body);
+    let formattedTime = formatTime(remainingTime);
+    console.log('Remaining time:', formattedTime);
+    res.status(200).json({ message: 'Request accepted', remaining: formattedTime });
   } else {
     res.status(400).json({ message: 'Request not accepted anymore' });
   }
@@ -54,35 +48,30 @@ function formatTime(timeInSeconds) {
   return `${minutes} minutes ${seconds} seconds`;
 }
 
-
 function processRequests() {
-  if (requests.length > 0) {
-    console.log(requests)
-  }
-
-  requests = [];
-
+  Draw();
   remainingTime = 3 * 60;
-
-  setTimeout(countdown, 1000); // Start the countdown
+  setTimeout(countdown, 60000)
+  acceptingRequests = true;
+  
 
 }
 
 function countdown() {
   remainingTime--;
-  if (remainingTime === 0) {
+  if (remainingTime <= 0) {
     acceptingRequests = true;
     processRequests();
   } else {
-    setTimeout(countdown, 1000); 
+    setTimeout(countdown, 1000);
   }
 }
 
 setTimeout(() => {
   acceptingRequests = false;
   processRequests();
-}, 3 * 60 * 1000);
-
+  setTimeout(countdown, 1000); 
+}, 1000); 
 
 
 
