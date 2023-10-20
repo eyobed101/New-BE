@@ -1,5 +1,9 @@
 import express from "express";
-import { Socket } from "socket.io";
+import { Server } from "socket.io";
+import http from 'http'
+import cors from 'cors'
+
+
 import { authenticate } from "../services/auth.Services.js";
 import AdminFunctions from "../controllers/Admin.Controller.js";
 import SuperAdminFunctions from "../controllers/SuperAdmin.Controller.js";
@@ -23,19 +27,46 @@ import bcrypt from "bcrypt";
 import User from "../models/users.js"
 import superAdmin from "../models/superAdmin.js";
 
+const app = express();
+app.use(cors())
+const server = http.createServer(app);
+server.listen(4000)
+const io = new Server(server)
+
+
 
 
 
 const router = express.Router();
 
 let acceptingRequests = true;
-let remainingTime = 3 * 60;
+let remainingTime = 10;
+let drawTime = 5;
+
+io.on('connection', (socket) => {
+  console.log('A user connected');
+
+  setInterval(() => {
+    socket.emit('remainingTime', remainingTime);
+    socket.emit('drawTime', drawTime);
+  }, 1000);
+
+  socket.on('disconnect', () => {
+    console.log('A user disconnected');
+  });
+});
 
 router.post('/accept', (req, res) => {
+
+  io.emit('remainingTime', formatTime(remainingTime));
+  io.emit('drawTime', formatTime(drawTime));
+
   if (acceptingRequests) {
     StoreTickets(req.body);
     let formattedTime = formatTime(remainingTime);
     console.log('Remaining time:', formattedTime);
+    
+
     res.status(200).json({ message: 'Request accepted', remaining: formattedTime });
   } else {
     res.status(400).json({ message: 'Request not accepted anymore' });
@@ -50,28 +81,37 @@ function formatTime(timeInSeconds) {
 
 function processRequests() {
   Draw();
-  remainingTime = 3 * 60;
-  setTimeout(countdown, 60000)
-  acceptingRequests = true;
-  
-
+  countdownDraw()
 }
 
 function countdown() {
   remainingTime--;
   if (remainingTime <= 0) {
-    acceptingRequests = true;
+    drawTime = 5;
+    acceptingRequests = false;
     processRequests();
   } else {
     setTimeout(countdown, 1000);
   }
 }
 
+function countdownDraw() {
+  drawTime--;
+  if (drawTime <= 0) {
+    remainingTime = 10;
+    countdown();
+    acceptingRequests = true;
+  } else {
+    setTimeout(countdownDraw, 1000);
+  }
+}
+
+
+
 setTimeout(() => {
   acceptingRequests = false;
-  processRequests();
-  setTimeout(countdown, 1000); 
-}, 1000); 
+  countdown();
+}, 1000);
 
 
 
