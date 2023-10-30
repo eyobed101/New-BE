@@ -18,7 +18,15 @@ const adminSchema = new mongoose.Schema({
     default: 0
   },
 
-  Revenue: {
+  totalIncomeInWeek: {
+    type: Number,
+    default:0
+  },
+  currntBalance: {
+    type: Number,
+    default:0
+  },
+  currentBalancePersentage: {
     type: Number,
     default:0
   },

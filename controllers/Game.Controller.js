@@ -25,7 +25,7 @@ let currentDifference = 0;
 const selectedTickets = [];
 const allSelectedNumbers = [];
 let totalMoneyCollected = 0;
-let ticket = [];
+
 
 
 let totalMoneyForJackpot = 0;

@@ -30,7 +30,7 @@ import superAdmin from "../models/superAdmin.js";
 const app = express();
 app.use(cors())
 const server = http.createServer(app);
-server.listen(4000)
+server.listen(4001)
 const io = new Server(server)
 
 
@@ -40,8 +40,8 @@ const io = new Server(server)
 const router = express.Router();
 
 let acceptingRequests = true;
-let remainingTime = 10;
-let drawTime = 5;
+let remainingTime = 180;
+let drawTime = 60;
 
 io.on('connection', (socket) => {
   console.log('A user connected');
@@ -87,7 +87,7 @@ function processRequests() {
 function countdown() {
   remainingTime--;
   if (remainingTime <= 0) {
-    drawTime = 5;
+    drawTime = 60;
     acceptingRequests = false;
     processRequests();
   } else {
@@ -98,7 +98,7 @@ function countdown() {
 function countdownDraw() {
   drawTime--;
   if (drawTime <= 0) {
-    remainingTime = 10;
+    remainingTime = 180;
     countdown();
     acceptingRequests = true;
   } else {
