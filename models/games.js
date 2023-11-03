@@ -24,16 +24,8 @@ const GameSchema = new mongoose.Schema({
     enum: ["Opened", "Closed", "Dummy"],
     default: "Opened",
   },
-  profitability: {
-    type: String,
-    enum: ["Gain", "Loss", "Win"],
-    default: "Gain",
-  },
-  unclaimedMoney: {
-    type: Number,
-    
-  },
-  numberOfPlayer:{
+
+  numberOfTicket:{
     type: Number,
   },
 
@@ -47,6 +39,8 @@ const GameSchema = new mongoose.Schema({
         type: Number,
         default: 0,
       },
+      
+
     },
   ],
 });
