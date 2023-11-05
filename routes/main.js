@@ -56,13 +56,13 @@ io.on('connection', (socket) => {
   });
 });
 
-router.post('/accept', (req, res) => {
+router.post('/accept', async (req, res) => {
 
   io.emit('remainingTime', formatTime(remainingTime));
   io.emit('drawTime', formatTime(drawTime));
 
   if (acceptingRequests) {
-    StoreTickets(req.body);
+    await StoreTickets(req.body);
     let formattedTime = formatTime(remainingTime);
     console.log('Remaining time:', formattedTime);
     
