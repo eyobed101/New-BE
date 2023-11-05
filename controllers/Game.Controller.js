@@ -4,7 +4,7 @@ import pkg from "uuidv4";
 import Admin from "../models/admin.js";
 import OddCalculator from "./OddCalculator.js"
 import shop from "./shopDetails.js"
-import tickets from "./selectedTicket.js"
+import sample from "./sampleTickets.js"
 
 
 let shopDetails = [];
@@ -46,6 +46,7 @@ export const Draw = async () => {
     // shopDetails = shop
     shopDetails = await Admin.find()
 
+    console.log("shop details now playing",shopDetails)
     const shopWithCurrentBalancePersentage = shopDetails
 
     //decending order
@@ -135,8 +136,8 @@ export const Draw = async () => {
         const selectedShopsCount = Math.ceil(negativeBalancedShop.length * 0.5);
         const selectedShops = [];
         //first push shops with long time in negative to selected shop
-        for (let i = 0; i <= negativeBalancedShop.length; i++) {
-            if (negativeBalancedShop[i].timeInNegative >= 172800) {
+        for (let i = 0; i < negativeBalancedShop.length; i++) {
+            if ( Date.parse(negativeBalancedShop[i].timeInNegative) >= 172800) {
                 selectedShops.push(negativeBalancedShop[i]);
                 if (selectedShops.length >= selectedShopsCount * 0.5) {
                     break;
@@ -195,12 +196,12 @@ export const Draw = async () => {
     }
 
 
-    for (let i = 0; i < tickets.length; i++) {
+    for (let i = 0; i < sample.length; i++) {
 
-        for (let k = 0; k < tickets[i].selectedNumbers.length; k++) {
-            allSelectedNumbers.push(tickets[i].selectedNumbers[k])
+        for (let k = 0; k < sample[i].selectedNumbers.length; k++) {
+            allSelectedNumbers.push(sample[i].selectedNumbers[k])
         }
-        selectedTickets.push(tickets[i]);
+        selectedTickets.push(sample[i]);
     }
 
     totalMoneyCollected = selectedTickets.reduce((sum, obj) => sum + obj.money, 0);
@@ -208,16 +209,17 @@ export const Draw = async () => {
     console.log('total money collected', totalMoneyCollected);
 
     negativeBalancedShop.forEach((shop) => {
-        allNegativeBalancedShopID.push(shop.shop_ID);
+        allNegativeBalancedShopID.push(shop.adminID.toString());
     });
     positiveBalancedShop.forEach((shop) => {
-        allPositiveBalancedShopID.push(shop.shop_ID);
+        allPositiveBalancedShopID.push(shop.adminID.toString());
     });
     console.log('negative shop ID ', allNegativeBalancedShopID);
     console.log('positive shop ID ', allPositiveBalancedShopID);
 
     //check which tickets are come from negative shop
     for (const ticket of selectedTickets) {
+        console.log("ticket selected IDs", ticket.shop_ID)
         if (allNegativeBalancedShopID.includes(ticket.shop_ID)) {
             negativeBalancedShopTickets.push(ticket);
         }
@@ -762,5 +764,25 @@ export const Draw = async () => {
 
     ForGain();
 
+    // const groupedTickets = sample.reduce((acc, ticket) => {
+    //     const { adminID, selectedNumbers, ...rest } = ticket;
+    //     const existingShop = acc.find((shop) => shop.adminID === adminID);
+    //     if (existingShop) {
+    //       existingShop.sample.push({ ticket_ID: ticket.ticket_ID, selectedNumbers, ...rest });
+    //     } else {
+    //       acc.push({ adminID, sample: [{ ticket_ID: ticket.ticket_ID, selectedNumbers, ...rest }] });
+    //     }
+    //     return acc;
+    //   }, []);
 
+    // const groupedData = groupedTickets()
+
+    // function UpdateShopDetails(finalLuckyNumber) {
+
+
+
+    //     for (let i=0; i<groupedData.length; i++){
+            
+    //     }
+    // }
 }

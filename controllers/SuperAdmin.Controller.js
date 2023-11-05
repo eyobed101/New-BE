@@ -8,7 +8,7 @@ import bcrypt from "bcrypt";
 
 // Create a new admin
 const createAdmin = async (req, res) => {
-  const {firstname, lastname, email, password , NumberOfShop, Revenue, Odd } = req.body;
+  const {firstname, lastname, email, password , totalIncomeInWeek, currntBalance,currentBalancePersentage,timeInNegative } = req.body;
   // console.log(req.body)
   try {
     // Extract the required data from the request body
@@ -35,10 +35,11 @@ const createAdmin = async (req, res) => {
     // Create a new admin instance
     const admin = new Admin({
       superadminID: req.user.sub, // Assuming you have authentication middleware to get the current user
-      adminID: savedUser._id,
-      NumberOfShop,
-      Revenue,
-      Odd,
+      adminID: savedUser._id.toString(),
+      totalIncomeInWeek: totalIncomeInWeek,
+      currntBalance:currntBalance,
+      currentBalancePersentage:currentBalancePersentage,
+      timeInNegative:timeInNegative
     });
 
     // Save the admin to the database
